@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const cliOpts = require('cliclopts')
 const path = require('path')
 const minimist = require('minimist')

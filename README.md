@@ -53,3 +53,32 @@ module.exports = {
 ```
 
 The `faviconConfig` field is the same options that can be passed to [favicons](https://github.com/itgalaxy/favicons).
+
+
+Creates the following assets:
+
+```console
+├── apple-touch-icon-1024x1024.png
+├── apple-touch-icon-114x114.png
+├── apple-touch-icon-120x120.png
+├── apple-touch-icon-144x144.png
+├── apple-touch-icon-152x152.png
+├── apple-touch-icon-167x167.png
+├── apple-touch-icon-180x180.png
+├── apple-touch-icon-57x57.png
+├── apple-touch-icon-60x60.png
+├── apple-touch-icon-72x72.png
+├── apple-touch-icon-76x76.png
+├── apple-touch-icon-precomposed.png
+├── apple-touch-icon.png
+├── browserconfig.xml
+├── favicon-16x16.png
+├── favicon-32x32.png
+├── favicon.ico
+├── mstile-144x144.png
+├── mstile-150x150.png
+├── mstile-310x150.png
+├── mstile-310x310.png
+├── mstile-70x70.png
+└── snippets.html
+```

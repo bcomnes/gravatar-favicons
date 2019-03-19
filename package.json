@@ -1,0 +1,50 @@
+{
+  "name": "gravatar-favicons",
+  "version": "1.0.0",
+  "description": "Generate every favicon from an email address's gravatar",
+  "main": "index.js",
+  "bin": "./bin.js",
+  "scripts": {
+    "debug": "node --nolazy --inspect-brk=9229 node_modules/.bin/tape 'test.js' | tap-format-spec",
+    "prepublishOnly": "git push && git push --tags && gh-release",
+    "report": "nyc report --reporter=text-lcov | coveralls",
+    "test": "run-s test:*",
+    "test:lint": "standard | snazzy",
+    "test:tape": "nyc tape 'test.js' | tap-format-spec",
+    "test:dependencies": "dependency-check package.json --missing --unused --no-dev",
+    "version": "run-s version:*",
+    "version:changelog": "auto-changelog -p --template keepachangelog --breaking-pattern 'breaking'",
+    "version:git": "git add CHANGELOG.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bcomnes/gravatar-favicons.git"
+  },
+  "keywords": [
+    "gravatar",
+    "favicon",
+    "favicons"
+  ],
+  "author": "Bret Comnes",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bcomnes/gravatar-favicons/issues"
+  },
+  "homepage": "https://github.com/bcomnes/gravatar-favicons#readme",
+  "dependencies": {
+    "bl": "^1.2.2",
+    "cliclopts": "^1.1.1",
+    "concat-stream": "^1.6.2",
+    "favicons": "^5.3.0",
+    "from2-string": "^1.1.0",
+    "gravatar-url": "^2.0.0",
+    "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
+    "pump": "^3.0.0",
+    "request": "^2.85.0",
+    "run-parallel-limit": "^1.0.4"
+  },
+  "devDependencies": {
+    "@bret/toolbox": "^1.0.1"
+  }
+}

@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/bcomnes/gravatar-favicons#readme",
   "dependencies": {
-    "bl": "^1.2.2",
+    "bl": "^4.0.3",
     "cliclopts": "^1.1.1",
     "concat-stream": "^1.6.2",
     "favicons": "^5.3.0",

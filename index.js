@@ -33,11 +33,9 @@ function gravatarFavicons (config, logger = (log) => {}, cb) {
     // console.log(response.files) // Array of { name: string, contents: <string> }
     // console.log(response.html)
     logger('got icons, making dir and saving')
-    mkdirp(path.join(config.dest), handleFiles)
+    mkdirp(path.join(config.dest)).then(handleFiles).catch(err => cb(err))
 
-    function handleFiles (err) {
-      if (err) return cb(err)
-
+    function handleFiles (made) {
       const bufferJobs = response.images.map(file => {
         return (cb) => {
           logger('writing ' + file.name)

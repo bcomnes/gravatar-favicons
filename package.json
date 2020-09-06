@@ -1,6 +1,6 @@
 {
   "name": "gravatar-favicons",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "Generate every favicon from an email address's gravatar",
   "main": "index.js",
   "bin": "./bin.js",

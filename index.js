@@ -1,6 +1,6 @@
 const gravatarUrl = require('gravatar-url')
 const favicons = require('favicons')
-const request = require('request')
+const fetch = require('node-fetch')
 const concatStream = require('concat-stream')
 const pump = require('pump')
 const mkdirp = require('mkdirp')
@@ -16,10 +16,9 @@ function gravatarFavicons (config, logger = (log) => {}, cb) {
   const avatarUrl = gravatarUrl(config.email, { size: 500 })
 
   const concat = concatStream(gotPicture)
-
-  pump(request(avatarUrl), concat, err => {
-    if (err) cb(err)
-  })
+  fetch(avatarUrl).then(resposne => {
+    pump(resposne.body, concat, err => { if (err) cb(err) })
+  }).catch(err => cb(err))
 
   function gotPicture (imageBuf) {
     logger('got picture')

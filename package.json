@@ -39,11 +39,11 @@
     "gravatar-url": "^3.1.0",
     "minimist": "^1.2.0",
     "mkdirp": "^1.0.4",
+    "node-fetch": "^2.6.1",
     "pump": "^3.0.0",
-    "request": "^2.85.0",
     "run-parallel-limit": "^1.0.4"
   },
   "devDependencies": {
-    "@bret/toolbox": "^3.0.0"
+    "@bret/toolbox": "^4.0.0"
   }
 }

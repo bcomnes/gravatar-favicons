@@ -7,6 +7,7 @@ const mkdirp = require('mkdirp')
 const path = require('path')
 const BufferList = require('bl')
 const fs = require('fs')
+const fsp = require('fs/promises')
 const fromString = require('from2-string')
 const parallelLimit = require('run-parallel-limit')
 
@@ -32,7 +33,7 @@ function gravatarFavicons (config, logger = (log) => {}, cb) {
     // console.log(response.files) // Array of { name: string, contents: <string> }
     // console.log(response.html)
     logger('got icons, making dir and saving')
-    mkdirp(path.join(config.dest)).then(handleFiles).catch(err => cb(err))
+    fsp.mkdirp(path.join(config.dest), { recursive: true }).then(handleFiles).catch(err => cb(err))
 
     function handleFiles (made) {
       const bufferJobs = response.images.map(file => {

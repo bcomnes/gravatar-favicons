@@ -7,12 +7,12 @@
   "bin": "./bin.js",
   "scripts": {
     "debug": "node --nolazy --inspect-brk=9229 node_modules/.bin/tape 'test.js' | tap-format-spec",
-    "prepublishOnly": "git push && git push --tags && gh-release",
+    "prepublishOnly": "git push --follow-tags && gh-release -y",
     "test": "run-s test:*",
     "test:lint": "standard",
     "test:node-test": "c8 node --test --test-reporter spec",
     "version": "run-s version:*",
-    "version:changelog": "auto-changelog -p --template keepachangelog --breaking-pattern 'breaking'",
+    "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
     "version:git": "git add CHANGELOG.md"
   },
   "repository": {

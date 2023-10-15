@@ -1,9 +1,14 @@
 #!/usr/bin/env node
-const cliOpts = require('cliclopts')
-const path = require('path')
-const minimist = require('minimist')
-const version = require('./package.json').version
-const gravatarFavicon = require('./index')
+import cliOpts from 'cliclopts'
+import path from 'path'
+import fs from 'fs/promises' // Use promises version of fs
+import minimist from 'minimist'
+import gravatarFavicon from './index.js'
+import { fileURLToPath } from 'url'
+
+const dirname = path.dirname(fileURLToPath(import.meta.url))
+const data = await fs.readFile(path.resolve(dirname, './package.json'), 'utf-8')
+const { version } = JSON.parse(data)
 
 const allowedOptions = [
   {
@@ -52,7 +57,8 @@ const config = {}
 
 if (argv.config) {
   const configPath = path.resolve(process.cwd(), argv.config)
-  Object.assign(config, require(configPath))
+  const configImport = await import(configPath)
+  Object.assign(config, configImport.default)
   if (config.dest) {
     // allow relative path resolution from configPath
     config.dest = path.resolve(path.dirname(configPath), config.dest)

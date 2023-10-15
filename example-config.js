@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   email: 'bcomnes@gmail.com',
   dest: './out',
   faviconConfig: {
@@ -30,7 +30,7 @@ module.exports = {
       coast: false, // Create Opera Coast icon. `boolean` or `{ offset, background }`
       favicons: true, // Create regular favicons. `boolean`
       firefox: false, // Create Firefox OS icons. `boolean` or `{ offset, background }`
-      windows: true, // Create Windows 8 tile icons. `boolean` or `{ background }`
+      windows: false, // Create Windows 8 tile icons. `boolean` or `{ background }`
       yandex: false // Create Yandex browser icon. `boolean` or `{ background }`
     }
   }

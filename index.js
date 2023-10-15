@@ -1,70 +1,85 @@
-const gravatarUrl = require('gravatar-url')
-const favicons = require('favicons')
-const fetch = require('node-fetch')
-const concatStream = require('concat-stream')
-const pump = require('pump')
-const mkdirp = require('mkdirp')
-const path = require('path')
-const BufferList = require('bl')
-const fs = require('fs')
-const fsp = require('fs/promises')
-const fromString = require('from2-string')
-const parallelLimit = require('run-parallel-limit')
+import gravatarUrl from 'gravatar-url'
+import favicons from 'favicons'
+import { request } from 'undici' // Import the undici request method
+import concatStream from 'concat-stream'
+import pump from 'pump'
+import path from 'path'
+import BufferList from 'bl'
+import fs from 'fs'
+import fsp from 'fs/promises'
+import fromString from 'from2-string'
+import pAll from 'p-all'
 
-module.exports = gravatarFavicons
-function gravatarFavicons (config, logger = (log) => {}, cb) {
+export default async function gravatarFavicons (config, logger = (log) => {}) {
   config = Object.assign({}, config)
-  const avatarUrl = gravatarUrl(config.email, { size: 500 })
+  const avatarUrl = gravatarUrl(config.email, { size: 1024 })
 
-  const concat = concatStream(gotPicture)
-  fetch(avatarUrl).then(resposne => {
-    pump(resposne.body, concat, err => { if (err) cb(err) })
-  }).catch(err => cb(err))
+  const imageBuf = await fetchPicture(avatarUrl)
+  logger('got picture')
 
-  function gotPicture (imageBuf) {
-    logger('got picture')
-    favicons(imageBuf, config.faviconConfig, handleIcons)
-  }
+  const response = await favicons(imageBuf, config.faviconConfig)
+  logger('got icons, making dir and saving')
 
-  function handleIcons (err, response) {
-    if (err) return cb(err)
-    // handling icons
-    // console.log(response.images) // Array of { name: string, contents: <buffer> }
-    // console.log(response.files) // Array of { name: string, contents: <string> }
-    // console.log(response.html)
-    logger('got icons, making dir and saving')
-    fsp.mkdirp(path.join(config.dest), { recursive: true }).then(handleFiles).catch(err => cb(err))
+  await fsp.mkdir(path.join(config.dest), { recursive: true })
+  await handleFiles(response, config, logger)
+}
 
-    function handleFiles (made) {
-      const bufferJobs = response.images.map(file => {
-        return (cb) => {
-          logger('writing ' + file.name)
-          const b = new BufferList(file.contents)
-          const w = fs.createWriteStream(path.join(config.dest, file.name))
-          pump(b, w, cb)
-        }
-      })
+async function fetchPicture (avatarUrl) {
+  const { body } = await request(avatarUrl) // Use undici's request method
+  return new Promise((resolve, reject) => {
+    const concat = concatStream(resolve)
+    pump(body, concat, (err) => {
+      if (err) reject(err)
+    })
+  })
+}
 
-      const fileJobs = response.files.map(file => {
-        return (cb) => {
-          logger('writing ' + file.name)
-          const b = fromString(file.contents)
-          const w = fs.createWriteStream(path.join(config.dest, file.name))
-          pump(b, w, cb)
-        }
-      })
+function handleFiles (response, config, logger) {
+  const bufferJobs = response.images.map(file => () => writeBuffer(file, config.dest, logger))
+  const fileJobs = response.files.map(file => () => writeFile(file, config.dest, logger))
+  const snippetJob = () => writeSnippet(response.html, config.dest, logger)
+  const jobs = [...bufferJobs, ...fileJobs, snippetJob]
+  return pAll(jobs, 5)
+}
 
-      const snippetJob = (cb) => {
-        logger('writing snippets.html')
-        const b = fromString(response.html.join('\n'))
-        const w = fs.createWriteStream(path.join(config.dest, 'snippets.html'))
-        pump(b, w, cb)
-      }
+function writeBuffer (file, dest, logger) {
+  return new Promise((resolve, reject) => {
+    logger('writing ' + file.name)
+    const b = new BufferList(file.contents)
+    const w = fs.createWriteStream(path.join(dest, file.name))
+    pump(b, w, (err) => {
+      if (err) reject(err)
+      else resolve()
+    })
+  })
+}
 
-      const jobs = [].concat(bufferJobs).concat(fileJobs)
-      jobs.push(snippetJob)
+function writeFile (file, dest, logger) {
+  return new Promise((resolve, reject) => {
+    logger('writing ' + file.name)
+    const b = fromString(file.contents)
+    const w = fs.createWriteStream(path.join(dest, file.name))
+    pump(b, w, (err) => {
+      if (err) reject(err)
+      else resolve()
+    })
+  })
+}
 
-      parallelLimit(jobs, 5, cb)
-    }
-  }
+function writeSnippet (html, dest, logger) {
+  return new Promise((resolve, reject) => {
+    logger('writing snippets.html')
+    const b = fromString(html.join('\n'))
+    const w = fs.createWriteStream(path.join(dest, 'snippets.html'))
+    pump(b, w, (err) => {
+      if (err) reject(err)
+      else resolve()
+    })
+  })
+}
+
+export function gravatarFaviconsCallback (config, logger, cb) {
+  gravatarFavicons(config, logger)
+    .then(() => cb(null))
+    .catch(err => cb(err))
 }
